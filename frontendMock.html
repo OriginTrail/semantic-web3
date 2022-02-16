@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="./dist/index.bundle.js"></script>
+    <script type="text/javascript">
+        function myFunction() {
+            console.log(SemanticWeb3)
+
+
+            const OT_NODE_HOSTNAME = '0.0.0.0';
+            const OT_NODE_PORT = '8900';
+
+            let options = { endpoint: OT_NODE_HOSTNAME, port: OT_NODE_PORT, useSSL: false, loglevel: 'trace' };
+            this.dkg = new SemanticWeb3(options);
+
+            this.dkg.nodeInfo().then(result => {
+                console.log('============ Node info results ===================');
+                console.log(JSON.stringify(result, null, 2));
+                console.log('===============================');
+            });
+        }
+    </script>
+</head>
+<body onload="myFunction()">
+
+<h1>Hello World!</h1>
+
+
+</body>
+</html>
