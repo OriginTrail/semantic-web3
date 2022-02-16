@@ -1,10 +1,11 @@
 {
   "name": "semantic-web3",
-  "version": "6.0.0-beta.1.14",
+  "version": "6.0.0-beta.1.15",
   "description": "Javascript library for interaction with the OriginTrail Decentralized Knowledge Graph",
   "main": "index.js",
   "scripts": {
-    "test": "npm run test"
+    "test": "npm run test",
+    "build": "npx webpack --config webpack.config.js"
   },
   "repository": {
     "type": "git",

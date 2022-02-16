@@ -7,6 +7,6 @@ module.exports = {
         path: path.resolve(__dirname, 'dist'),
         filename: 'index.bundle.js',
         libraryTarget: "var",
-        library: "DkgTest",
+        library: "SemanticWeb3",
     },
 };
