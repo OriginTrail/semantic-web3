@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
     <script src="./dist/index.bundle.js"></script>
-    <script type="text/javascript">
-        function myFunction() {
-            console.log(SemanticWeb3)
+    <script>
+        window.addEventListener('load', async function () {
+            loadMetamask()
 
-
-            const OT_NODE_HOSTNAME = '0.0.0.0';
+            const OT_NODE_HOSTNAME = 'alpha-stella-node-06.origin-trail.network';
             const OT_NODE_PORT = '8900';
 
-            let options = { endpoint: OT_NODE_HOSTNAME, port: OT_NODE_PORT, useSSL: false, loglevel: 'trace' };
+            let options = { endpoint: OT_NODE_HOSTNAME, port: OT_NODE_PORT, useSSL: true, loglevel: 'trace' };
             this.dkg = new SemanticWeb3(options);
 
             this.dkg.nodeInfo().then(result => {
@@ -18,10 +18,127 @@
                 console.log(JSON.stringify(result, null, 2));
                 console.log('===============================');
             });
+
+            options = {
+                keywords: ['tracie', 'nft', 'origintrail'],
+                visibility: 'public'
+            };
+
+            const content = {
+                "@context": "https://www.schema.org/",
+                "@type": "ERC721",
+                "asset_data": {
+                    "properties": {
+                        "prop1": "value1",
+                        "prop2": {
+                            "abc":"ads",
+                            "abs":"adsb"
+                        },
+                    },
+
+                    "urls": "https://opensea.io/assets/0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d/8520"
+
+                },
+                "keywords": [
+                    "tracie",
+                    "origintrail",
+                    "denver",
+                ],
+                "native_blockchain": "polygon",
+                "onchain_data": {
+                    "contract_address": "0x123",
+                    "tokenID": "32",
+                    "tokenURI": "....",
+                    "owner": "0x12345431",
+                    "name": "Tracie 101 Updated",
+                    "symbol": "TRACIE",
+                    "eventHistory": [{
+                        "timestamp": "2020-10-12",
+                        "from": "0x123",
+                        "to": "0x343",
+                        "event": "Transfer",
+                    },
+                        {
+                            "timestamp": "2020-09-11",
+                            "from": "0x123",
+                            "to": "0x343",
+                            "event": "Sale",
+                            "price": "1.23",
+                            "currency": "ETH",
+                        }
+
+                    ]
+                },
+                "erc721_metadata": {
+                    "title": "Asset Metadata",
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string",
+                            "description": "Identifies the asset to which this NFT represents"
+                        },
+                        "description": {
+                            "type": "string",
+                            "description": "Describes the asset to which this NFT represents"
+                        },
+                        "image": {
+                            "type": "string",
+                            "description": "A URI pointing to a resource with mime type image/* representing the asset to which this NFT represents. Consider making any images at a width between 320 and 1080 pixels and aspect ratio between 1.91:1 and 4:5 inclusive."
+                        }
+                    }
+                },
+                "linkedTo": [
+                    "ual1",
+                    "ual2",
+                ]
+            }
+            content.proof = await signMessage(content.toString())
+            let result = await dkg.assets.create(content,options)
+            let ual = result.data.metadata.UALs[0];
+            console.log(`Created UAL is ${ual}`)
+
+            let asset = await dkg.assets.get(ual);
+
+            const proof = await asset.data.proof.valueOf;
+            console.log(`Proof is ${JSON.stringify(proof)}}`)
+        });
+
+        function loadMetamask(){
+            if (window.ethereum) {
+                window.web3 = new Web3(ethereum);
+                ethereum.enable()
+                    .then(() => {
+                        console.log("Ethereum enabled");
+
+                        web3.eth.getAccounts(function (err, acc) {
+                            if (err != null) {
+                                self.setStatus("There was an error fetching your accounts");
+                                return;
+                            }
+                            if (acc.length > 0) {
+                                console.log(acc);
+                            }
+                        });
+                    })
+                    .catch(() => {
+                        console.warn('User didn\'t allow access to accounts.');
+                        waitLogin();
+                    });
+            } else {
+                console.log("Non-Ethereum browser detected. You should consider installing MetaMask.");
+            }
+        }
+
+        async function signMessage(message) {
+            const web3 = new Web3(window.ethereum);
+            var hash = web3.utils.sha3(message)
+            var accounts = await web3.eth.getAccounts()
+            var signature = await web3.eth.personal.sign(hash, accounts[0])
+            return {hash, account: accounts[0], signature}
         }
     </script>
 </head>
-<body onload="myFunction()">
+<body>
 
 <h1>Hello World!</h1>
 
