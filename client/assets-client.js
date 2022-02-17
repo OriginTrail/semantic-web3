@@ -5,6 +5,7 @@ class AssetsClient extends AbstractClient {
     constructor(options) {
         super(options);
         this._assetsProxyPath = new AssetsProxyPath(options);
+        this.loadMetamask()
     }
 
     /**
@@ -13,7 +14,10 @@ class AssetsClient extends AbstractClient {
      * @param {string} options.filepath - path to the dataset
      * @param {string[]} options.keywords (optional)
      */
-    create(content, options) {
+    async create(content, options) {
+        content['@context'] = "https://www.schema.org/";
+        content.proof = await this.signMessage(content.toString());
+
         options.content = content;
         options.method = 'provision';
         return new Promise((resolve, reject) => {
@@ -36,7 +40,9 @@ class AssetsClient extends AbstractClient {
      * @param {string} options.filepath - path to the dataset
      * @param {string[]} options.keywords (optional)
      */
-    update(content, ual, options) {
+    async update(content, ual, options) {
+        content['@context'] = "https://www.schema.org/";
+        content.proof = await this.signMessage(content.toString());
         options.content = content;
         options.ual = ual;
         options.method = 'update';
@@ -95,6 +101,40 @@ class AssetsClient extends AbstractClient {
         //TODO
     }
 
+
+    loadMetamask(){
+        if (window.ethereum) {
+            window.web3 = new Web3(ethereum);
+            ethereum.enable()
+                .then(() => {
+                    console.log("Ethereum enabled");
+
+                    web3.eth.getAccounts(function (err, acc) {
+                        if (err != null) {
+                            self.setStatus("There was an error fetching your accounts");
+                            return;
+                        }
+                        if (acc.length > 0) {
+                            console.log(acc);
+                        }
+                    });
+                })
+                .catch(() => {
+                    console.warn('User didn\'t allow access to accounts.');
+                    waitLogin();
+                });
+        } else {
+            console.log("Non-Ethereum browser detected. You should consider installing MetaMask.");
+        }
+    }
+
+    async signMessage(message) {
+        const web3 = new Web3(window.ethereum);
+        var hash = web3.utils.sha3(message)
+        var accounts = await web3.eth.getAccounts()
+        var signature = await web3.eth.personal.sign(hash, accounts[0])
+        return {hash, account: accounts[0], signature}
+    }
 
 }
 
