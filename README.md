@@ -176,7 +176,7 @@ The easiest way to jumpstart development in a local environment is to [set up OT
             console.log(`Proof is ${JSON.stringify(proof)}}`)
 
             // Search for assertions by using a keyword
-            options = { query: 'ETHDenver', resultType: 'assets' }; //or entities
+            options = { query: 'ETHDenver', resultType: 'assertions' }; //or entities
             await dkg.search(options).then((result) => {
                 console.log(JSON.stringify(result, null, 2));
             });
