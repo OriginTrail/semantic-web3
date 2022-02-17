@@ -1,10 +1,10 @@
-![](https://i.imgur.com/XkISdML.png)
+![](./header.png)
 
-# DKG Client v6
+# Semantic We3
 
 **Javascript library for interaction with the OriginTrail Decentralized Knowledge Graph**
 
-**Note**: This library is currently in beta, so you can expect issues to arise. We'd appreciate that if you do run into trouble, you [open up an issue on this repository](https://github.com/OriginTrail/dkg-client/issues) and let us know. 
+**Note**: This library is currently in beta, so you can expect issues to arise. We'd appreciate that if you do run into trouble, you [open up an issue on this repository](https://github.com/OriginTrail/semantic-web3/issues) and let us know. 
 Also, there are two actively maintained versions, v5 and v6, make sure you are using the appropriate one.
 The official OriginTrail documentation for v6 can be found [here](https://docs.origintrail.io/dkg-v6-upcoming-version/introduction-to-dkg-v6-start-here).
 
@@ -53,15 +53,21 @@ More information is available on the OriginTrail [website](https://origintrail.i
 
 This library provides an interface into the OriginTrail Decentralized Knowledge Graph, enabling:
 
-* importing & publishing of data to the public DKG
+* provisioning & updating assets on the public DKG
 * network and local querying of information based on topics and identifiers
 * verifying the integrity of queried data
-* exporting of datasets in different [formats](https://docs.origintrail.io/en/latest/ODN-Functionalities/dataset-operations.html#supported-standards)
 
 ### Instalation
 
+Run:
 ```sh
-npm install dkg-client
+npm install semantic-web3
+```
+
+Include:
+```javascript
+<script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+<script src="./node_modules/dist/index.bundle.js"></script>
 ```
 
 ### Setting up your development environment
@@ -70,71 +76,154 @@ The easiest way to jumpstart development in a local environment is to [set up OT
 
 ### Getting started
 
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script src="./dist/index.bundle.js"></script>
+    <script>
+        window.addEventListener('load', async function () {
 
-```js
-const DKGClient = require('dkg-client');
+            const OT_NODE_HOSTNAME = 'alpha-stella-node-06.origin-trail.network';
+            const OT_NODE_PORT = '8900';
+            let options = { endpoint: OT_NODE_HOSTNAME, port: OT_NODE_PORT, useSSL: true, loglevel: 'trace' };
+            
+            this.dkg = new SemanticWeb3(options);
 
-const OT_NODE_HOSTNAME = '0.0.0.0';
-const OT_NODE_PORT = '8900';
+            this.dkg.nodeInfo().then(result => {
+                console.log(JSON.stringify(result, null, 2));
+            });
 
-// initialize connection to your DKG Node
-let options = { endpoint: OT_NODE_HOSTNAME, port: OT_NODE_PORT, useSSL: false };
-const dkg = new DKGClient(options);
+            // Create and update an assertion
+            options = {
+                keywords: ['ETHDenver'],
+                visibility: 'public'
+            };
 
-// get info about endpoint that you connected to
-dkg.nodeInfo().then(result => console.log(result));
+            const content = {
+                "@context": "https://www.schema.org/",
+                "@type": "ERC721",
+                "asset_data": {
+                    "properties": {
+                        "prop1": "value1",
+                        "prop2": {
+                            "abc":"ads",
+                            "abs":"adsb"
+                        },
+                    },
 
-// publishing a dataset
-options = { filepath: './kg-example.json', assets: ['ExecutiveAnvil'], keywords: ['Product', 'Executive Objects', 'ACME'], visibility: true };
-dkg.publish(options).then((result) => {
-    console.log(JSON.stringify(result))
-});
+                    "urls": "https://opensea.io/assets/0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d/8520"
 
-// resolving assertion
-options =  { ids: [
-        '066787bc7269c062fe73b0ebb004c258e07151777e6dfba027fea046df5caf7c',
-        '2286826799d0a32a6f0eec7813fcb627910be45fca21f6378cb26ca95097c939'
-    ] };dkg.resolve(options).then((result) => {
-    console.log(JSON.stringify(result));
-});
+                },
+                "native_blockchain": "polygon",
+                "onchain_data": {
+                    "contract_address": "0x123",
+                    "tokenID": "32",
+                    "tokenURI": "....",
+                    "owner": "0x12345431",
+                    "name": "Tracie 101 Updated",
+                    "symbol": "TRACIE",
+                    "eventHistory": [{
+                        "timestamp": "2020-10-12",
+                        "from": "0x123",
+                        "to": "0x343",
+                        "event": "Transfer",
+                    },
+                        {
+                            "timestamp": "2020-09-11",
+                            "from": "0x123",
+                            "to": "0x343",
+                            "event": "Sale",
+                            "price": "1.23",
+                            "currency": "ETH",
+                        }
 
-// search assertions
-options = { query: 'Product', resultType: 'assertions' };
-dkg.search(options).then((result) => {
-    console.log(JSON.stringify(result));
-});
-
-// search entities
-options = { query: 'Product', resultType: 'entities' };
-dkg.search(options).then((result) => {
-    console.log(JSON.stringify(result));
-});
-
-// execute sparql query on dkg
-options = {
-    query: `PREFIX schema: <http://schema.org/>
-            CONSTRUCT { ?s ?p ?o }
-            WHERE {
-                GRAPH ?g {
-                ?s ?p ?o .
-                ?s schema:hasVisibility ?v
+                    ]
+                },
+                "erc721_metadata": {
+                    "title": "Asset Metadata",
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string",
+                            "description": "Identifies the asset to which this NFT represents"
+                        },
+                        "description": {
+                            "type": "string",
+                            "description": "Describes the asset to which this NFT represents"
+                        },
+                        "image": {
+                            "type": "string",
+                            "description": "A URI pointing to a resource with mime type image/* representing the asset to which this NFT represents. Consider making any images at a width between 320 and 1080 pixels and aspect ratio between 1.91:1 and 4:5 inclusive."
+                        }
+                    }
+                },
+                "linkedTo": [
+                    "ual1",
+                    "ual2",
+                ]
             }
-        }`
-};
-dkg.query(options).then((result) => {
-    console.log(JSON.stringify(result));
-});
+            
+            let result = await dkg.assets.create(content,options)
+            let ual = result.data.metadata.UALs[0];
+            console.log(`Created UAL is ${ual}`)
 
-// validate some triples that we can get querying
-options = {
-    nquads: ['<did:dkg:87c4edd8695ab8a493015361b5a564c82f90f4c5e6c5e5cc9adccf4e11a63ad7> <http://schema.org/hasType> \"person\" .',
-        '<did:dkg:25304bfd61ddcf490dfe852b883c01918768c114a84dcda0ac4aff179ff9ba65> <http://schema.org/hasType> \"person\" .',
-    ],
-};
-await dkg.validate(options).then((result) => {
-    console.log(JSON.stringify(result, null, 2));
-});
+            // Get an asset
+            let asset = await dkg.assets.get(ual);
 
+            const proof = await asset.data.proof.valueOf;
+            console.log(`Proof is ${JSON.stringify(proof)}}`)
+
+            // Search for assertions by using a keyword
+            options = { query: 'ETHDenver', resultType: 'assets' }; //or entities
+            await dkg.search(options).then((result) => {
+                console.log(JSON.stringify(result, null, 2));
+            });
+
+            // Run sparql queries
+
+            // Retrieve all connected UALs for a given UAL
+            ual = 'a44c97e1a27eab0db298f01f1a5d7c9d84caed8c7ce91480acaf92989888fc37';
+            options = {
+                query: `PREFIX schema: <http://schema.org/>
+                        construct { ?b2 schema:linkedTo ?linkedAssets }
+                        WHERE {
+                            GRAPH ?g {
+                                ?b1 schema:linkedTo ?linkedAssets .
+                            }
+                            ?b2 schema:hasUALs '${ual}'
+                            FILTER (?g = ?b2)
+                        }`
+            };
+
+            dkg.query(options).then((result) => {
+                console.log(JSON.stringify(result, null, 2));
+            });
+            
+            // Get all states for an asset
+            ual = 'a44c97e1a27eab0db298f01f1a5d7c9d84caed8c7ce91480acaf92989888fc37';
+            options = {
+                query: `PREFIX schema: <http://schema.org/>
+                        construct { ?assertionId schema:hasUALs ?assertionId }
+                        WHERE {
+                            ?assertionId schema:hasUALs '${ual}' .
+                        }`
+            };
+
+            dkg.query(options).then((result) => {
+                console.log(JSON.stringify(result, null, 2));
+            });
+        });
+    </script>
+</head>
+<body>
+
+<h1>Traceon!</h1>
+
+
+</body>
+</html>
 ```
 
 ## Learn more
@@ -145,5 +234,4 @@ More information can be found on the [official DKGv6 documentation](https://docs
 
 Get in touch with the OriginTrail tech community through [Discord](https://discordapp.com/invite/FCgYk2S). 
 
-
-#traceon
+[`#traceon`]()
