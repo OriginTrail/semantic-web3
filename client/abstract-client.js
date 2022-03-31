@@ -73,6 +73,7 @@ class AbstractClient {
             method: "post",
             url: `${this.nodeBaseUrl}/${options.method}`,
             data: form,
+            headers: {...form.getHeaders()}
         };
 
         return axios(axios_config);
@@ -180,13 +181,11 @@ class AbstractClient {
             throw Error("Unable to get results, need handler id");
         }
         let searchResponse = {};
-        let retries = 0;
         let timeout = options.timeout ? options.timeout : this.defaultTimeoutInSeconds;
         let numberOfResults = options.numberOfResults
             ? options.numberOfResults
             : this.defaultNumberOfResults;
 
-        const form = new FormData();
         let axios_config = {
             method: "get",
             url: `${this.nodeBaseUrl}/${options.resultType}:search/result/${options.handler_id}`,
@@ -240,10 +239,12 @@ class AbstractClient {
         let type = options.type ? options.type : "construct";
         let sparqlQuery = options.query;
         form.append("query", sparqlQuery);
+        form.append("type", type);
         let axios_config = {
             method: "post",
-            url: `${this.nodeBaseUrl}/query?type=${type}`,
+            url: `${this.nodeBaseUrl}/query`,
             data: form,
+            headers: {...form.getHeaders()}
         };
         return axios(axios_config);
     }
@@ -288,6 +289,7 @@ class AbstractClient {
             method: "post",
             url: `${this.nodeBaseUrl}/proofs:get`,
             data: form,
+            headers: { ...form.getHeaders() }
         };
         return axios(axios_config);
     }
