@@ -1,7 +1,8 @@
+⛔️ DEPRECATED: semantic-web3 is now included in [dkg.js](https://github.com/OriginTrail/dkg.js)
+======
+
 ![](./header.png)
 
-# DEPRECATED  ⚠️
-This package is **deprecated** in favor of [dkg.js](https://github.com/OriginTrail/dkg.js)
 # Semantic Web3
 
 **Javascript library for interaction with the OriginTrail Decentralized Knowledge Graph**
